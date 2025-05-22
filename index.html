@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INBA Chile 2025</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .teatro {
+            text-align: center;
+        }
+        .escenario {
+            background-color: #444;
+            color: white;
+            padding: 10px;
+            margin: 20px auto;
+            width: 60%;
+            font-weight: bold;
+            border-radius: 8px;
+        }
+        .fila {
+            display: flex;
+            justify-content: center;
+            margin: 4px 0;
+        }
+        .asiento {
+            width: 30px;
+            height: 30px;
+            margin: 2px;
+            background-color: green;
+            color: white;
+            border-radius: 4px;
+            line-height: 30px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        .asiento.vip {
+            background-color: gold;
+            color: black;
+        }
+        .asiento.ocupado {
+            background-color: red;
+            cursor: not-allowed;
+        }
+        #seleccionados {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        button.enviar {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>INBA Chile 2025 - Natural House Championships</h1>
+        <p>24 de agosto de 2025 - 10:00 AM<br>Teatro de San Javier, Arturo Prat 2480, San Javier de Loncomilla, Región del Maule</p>
+    </header>
+
+    <section class="teatro">
+        <h2>Distribución de Butacas - Teatro San Javier</h2>
+        <div class="escenario">ESCENARIO</div>
+        <div id="sala"></div>
+        <div id="seleccionados">Asientos seleccionados: ninguno</div>
+        <button class="enviar" onclick="enviarReserva()">Enviar reserva por WhatsApp</button>
+    </section>
+
+    <footer>
+        <p>Contacto: <a href="mailto:chileinba@gmail.com">chileinba@gmail.com</a> | WhatsApp: <a href="https://wa.me/56961451122">+56 9 6145 1122</a></p>
+    </footer>
+
+    <script>
+        const filas = 21;
+        const columnas = "ABCDEFGHIJK".split("");
+        const sala = document.getElementById("sala");
+        const seleccionados = new Set();
+        const seleccionadosDiv = document.getElementById("seleccionados");
+
+        const ocupados = []; // Ejemplo: ["A1", "C2"]
+
+        for (let f = 1; f <= filas; f++) {
+            const filaDiv = document.createElement("div");
+            filaDiv.className = "fila";
+
+            columnas.forEach(c => {
+                const id = c + f;
+                const seat = document.createElement("div");
+                seat.textContent = c;
+                seat.className = "asiento";
+                if (f <= 3) seat.classList.add("vip");
+                if (ocupados.includes(id)) {
+                    seat.classList.add("ocupado");
+                } else {
+                    seat.onclick = () => {
+                        if (seat.classList.contains("ocupado")) return;
+                        if (seleccionados.has(id)) {
+                            seleccionados.delete(id);
+                            seat.style.backgroundColor = seat.classList.contains("vip") ? "gold" : "green";
+                        } else {
+                            seleccionados.add(id);
+                            seat.style.backgroundColor = "orange";
+                        }
+                        actualizarSeleccion();
+                    };
+                }
+                filaDiv.appendChild(seat);
+            });
+
+            sala.appendChild(filaDiv);
+        }
+
+        function actualizarSeleccion() {
+            const lista = Array.from(seleccionados).sort().join(", ");
+            seleccionadosDiv.textContent = lista
+                ? "Asientos seleccionados: " + lista
+                : "Asientos seleccionados: ninguno";
+        }
+
+        function enviarReserva() {
+            if (seleccionados.size === 0) {
+                alert("Debes seleccionar al menos un asiento.");
+                return;
+            }
+            const lista = Array.from(seleccionados).sort().join(", ");
+            const mensaje = `Hola, quiero reservar los siguientes asientos para el evento INBA Chile 2025: ${lista}. Por favor confirmar.`;
+            const url = "https://wa.me/56961451122?text=" + encodeURIComponent(mensaje);
+            window.open(url, "_blank");
+        }
+    </script>
+</body>
+</html>
